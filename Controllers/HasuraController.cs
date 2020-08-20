@@ -12,10 +12,12 @@ using SendGrid;
 using SendGrid.Helpers.Mail;
 using User = Godwit.Common.Data.Model.User;
 
-namespace Godwit.HandleUserInsertedEvent.Controllers {
+namespace Godwit.HandleUserInsertedEvent.Controllers
+{
     [ApiController]
     [Route("")]
-    public class HasuraController : ControllerBase {
+    public class HasuraController : ControllerBase
+    {
         private readonly IConfiguration _configuration;
         private readonly ILogger _logger;
         private readonly UserManager<User> _manager;
@@ -24,7 +26,8 @@ namespace Godwit.HandleUserInsertedEvent.Controllers {
 
         public HasuraController(IValidator<HasuraEvent> validator,
             ILogger<HasuraController> logger, ISendGridClient sendGridClient, IConfiguration configuration,
-            UserManager<User> manager) {
+            UserManager<User> manager)
+        {
             _validator = validator;
             _logger = logger;
             _sendGridClient = sendGridClient;
@@ -33,8 +36,9 @@ namespace Godwit.HandleUserInsertedEvent.Controllers {
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] HasuraEvent model) {
-            _logger.LogInformation($"Call Started by {model.Event.Session.UserId} having role {model.Event.Session.Role}");
+        public async Task<IActionResult> Post([FromBody] HasuraEvent model)
+        {
+            _logger.LogInformation($"Call Started by {model.Event?.Session?.UserId ?? "not-provided"} having role {model.Event?.Session?.Role ?? "not-provided"}");
             var validation = _validator.Validate(model);
             if (!validation.IsValid)
             {
@@ -43,7 +47,8 @@ namespace Godwit.HandleUserInsertedEvent.Controllers {
                 );
             }
 
-            try {
+            try
+            {
                 var user = await _manager.FindByNameAsync(model.Event.Data.NewValue.UserName).ConfigureAwait(false);
                 var token = await _manager.GenerateEmailConfirmationTokenAsync(user);
                 var message =
@@ -58,7 +63,8 @@ namespace Godwit.HandleUserInsertedEvent.Controllers {
 
                 return StatusCode((int)response.StatusCode);
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 _logger.LogError(new EventId(1001, "Exception"), e, "Unable to Save Data!");
                 return Problem("Unable to Send Email!, An Exception Occur!");
             }
