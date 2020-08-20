@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using FluentValidation;
 using Godwit.HandleUserInsertedEvent.Model;
@@ -33,10 +34,14 @@ namespace Godwit.HandleUserInsertedEvent.Controllers {
 
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] HasuraEvent model) {
+            _logger.LogInformation($"Call Started by {model.Event.Session.UserId} having role {model.Event.Session.Role}");
             var validation = _validator.Validate(model);
             if (!validation.IsValid)
+            {
+                _logger.LogWarning("request validation failed!");
                 return BadRequest(validation.Errors.Select(e => e.ErrorMessage)
                 );
+            }
 
             try {
                 var user = await _manager.FindByNameAsync(model.Event.Data.NewValue.UserName).ConfigureAwait(false);
@@ -48,8 +53,10 @@ namespace Godwit.HandleUserInsertedEvent.Controllers {
                     new EmailAddress(user.Email, model.Event.Data.NewValue.Name),
                     "Thank you for registering with Keto App", "", message);
                 var response = await _sendGridClient.SendEmailAsync(msg).ConfigureAwait(false);
+                if (response.StatusCode != HttpStatusCode.Accepted && response.StatusCode != HttpStatusCode.OK)
+                    _logger.LogWarning($"Unable to send Email: {response.StatusCode}");
 
-                return Ok(new {response.StatusCode});
+                return StatusCode((int)response.StatusCode);
             }
             catch (Exception e) {
                 _logger.LogError(new EventId(1001, "Exception"), e, "Unable to Save Data!");

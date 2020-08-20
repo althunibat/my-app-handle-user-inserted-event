@@ -16,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SendGrid.Extensions.DependencyInjection;
+using Serilog;
 using StackExchange.Redis;
 using User = Godwit.Common.Data.Model.User;
 
@@ -82,6 +83,7 @@ namespace Godwit.HandleUserInsertedEvent {
             app.UseRouting();
 
             app.UseAuthorization();
+            app.UseSerilogRequestLogging();
 
             app.UseEndpoints(endpoints => {
                 endpoints.MapControllers();
