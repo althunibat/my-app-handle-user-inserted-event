@@ -42,6 +42,7 @@ namespace Godwit.HandleUserInsertedEvent {
             services.AddControllers()
                 .AddFluentValidation(cfg => cfg.AutomaticValidationEnabled = false);
             services.AddSingleton<IValidator<HasuraEvent>, HasuraEventValidator>();
+            
             services.AddSendGrid(cfg => { cfg.ApiKey = Configuration["SEND_GRID_API_KEY"]; });
             services
                 .AddDbContextPool<KetoDbContext>(opt => {
