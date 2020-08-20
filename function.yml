@@ -1,0 +1,21 @@
+version: 1.0
+provider:
+  name: openfaas
+  gateway: https://fn.godwit.io
+functions:
+  handle-user-inserted-event:
+    lang: dockerfile
+    handler: .
+    image: harbor.godwit.io/library/user-inserted-handler:${DRONE_TAG}
+    environment:
+      FROM_EMAIL: keto-app@godwit.io
+      SEND_GRID_API_KEY: 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
+      DB_HOST: postgres.apps.svc
+      HASURA_DB: keto_db
+      DB_USERNAME: postgres
+      DB_PASSWORD: 1qaz!QAZ
+      CERT_PATH: /app/
+      CERT_FILENAME: godwit.cert.pfx
+      CERT_PASSWORD: P@ssw0rd.123
+      REDIS_PASSWORD: 1qaz!QAZ
+      REDIS_HOST: 'redis-master.apps.svc:6379,redis-slave.apps.svc:6379'
