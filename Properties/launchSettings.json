@@ -6,7 +6,7 @@
       "environmentVariables": {
         "DB_USERNAME": "postgres",
         "DB_PASSWORD": "1qaz!QAZ",
-        "SEND_GRID_API_KEY": "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",
+        "SEND_GRID_API_KEY": "",
         "CERT_PASSWORD": "P@ssw0rd.123",
         "DB_HOST": "apps.db.godwit.io",
         "CERT_PATH": "./",
